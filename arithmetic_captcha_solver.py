@@ -9,7 +9,7 @@ from __future__ import annotations
 import argparse
 import re
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 
 _OPERATOR_MAP = {
@@ -55,7 +55,10 @@ def _maybe_preprocess_variants(image_bytes: bytes) -> List[bytes]:
     except Exception:
         return variants
 
-    arr = np.frombuffer(image_bytes, dtype=np.uint8)
+    try:
+        arr = np.frombuffer(image_bytes, dtype=np.uint8)
+    except Exception:
+        return variants
     img = cv2.imdecode(arr, cv2.IMREAD_GRAYSCALE)
     if img is None:
         return variants
@@ -88,6 +91,7 @@ def repair_likely_merged_operator(expr: str) -> str:
     r"""Repair likely operator-loss OCR output.
 
     Heuristic:
+    - This repair path targets one-digit right operands only.
     - If left side is 2+ digits and right side is 1 digit (`\d{2,}[op]\d`),
       prefer taking the first left digit as true left operand.
     """
@@ -128,7 +132,7 @@ def compute_expression(expr: str) -> Optional[float]:
     return None
 
 
-def _format_answer(value: float) -> float | int:
+def _simplify_answer(value: float) -> Union[float, int]:
     return int(value) if value.is_integer() else value
 
 
@@ -150,7 +154,7 @@ def solve_from_ocr_text(raw_text: str) -> SolveResult:
         raw_text=raw_text,
         normalized_expression=normalized,
         fixed_expression=fixed,
-        answer=_format_answer(answer),
+        answer=_simplify_answer(answer),
         error=None,
     )
 

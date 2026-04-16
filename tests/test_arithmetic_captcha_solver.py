@@ -39,6 +39,12 @@ class ArithmeticCaptchaSolverTests(unittest.TestCase):
         self.assertEqual(result.fixed_expression, "4-2")
         self.assertEqual(result.answer, 2)
 
+    def test_multi_digit_right_operand_no_repair(self):
+        result = solve_from_ocr_text("123-45=?")
+        self.assertTrue(result.ok)
+        self.assertEqual(result.fixed_expression, "123-45")
+        self.assertEqual(result.answer, 78)
+
     def test_invalid_or_noisy_string(self):
         result = solve_from_ocr_text("abc??")
         self.assertFalse(result.ok)
@@ -79,7 +85,7 @@ class ArithmeticCaptchaSolverTests(unittest.TestCase):
         self.assertEqual(result.answer, 2)
 
     def test_solve_image_path_reads_file(self):
-        with tempfile.NamedTemporaryFile(delete=True) as tf:
+        with tempfile.NamedTemporaryFile() as tf:
             tf.write(b"bytes")
             tf.flush()
             with mock.patch.object(
@@ -88,6 +94,10 @@ class ArithmeticCaptchaSolverTests(unittest.TestCase):
                 result = arithmetic_captcha_solver.solve_image_path(tf.name)
         mocked.assert_called_once_with(b"bytes")
         self.assertTrue(result.ok)
+
+    def test_solve_image_path_missing_file(self):
+        with self.assertRaises(FileNotFoundError):
+            arithmetic_captcha_solver.solve_image_path("/tmp/does-not-exist.png")
 
     def test_main_success_output(self):
         fake = SolveResult(True, "42-2", "42-2", "4-2", 2, None)
