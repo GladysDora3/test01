@@ -81,14 +81,14 @@ class ArithmeticCaptchaSolver:
         m = re.fullmatch(r"(\d{2})([+\-*/])(\d{1,2})", expr)
         if m:
             left, op, right = m.groups()
-            if "0" in left:
+            if re.fullmatch(r"[1-9]0", left):
                 return expr
             return f"{left[0]}{op}{right}"
 
         m = re.fullmatch(r"(\d{1,2})([+\-*/])(\d{2})", expr)
         if m:
             left, op, right = m.groups()
-            if "0" in right:
+            if re.fullmatch(r"[1-9]0", right):
                 return expr
             return f"{left}{op}{right[0]}"
 
