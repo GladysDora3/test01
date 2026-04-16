@@ -38,7 +38,7 @@ def _repair_merged_first_operand(expression: str) -> str:
         return expression
 
     first, op, second = match.groups()
-    if first[1] == second:
+    if first[1] == second[0]:
         return f"{first[0]}{op}{second}"
 
     return expression
