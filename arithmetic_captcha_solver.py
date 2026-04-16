@@ -85,7 +85,7 @@ def normalize_ocr_text(text: str) -> str:
 
 
 def repair_likely_merged_operator(expr: str) -> str:
-    r"""Repair likely operator-loss OCR output, e.g. `42-2` -> `4-2`.
+    r"""Repair likely operator-loss OCR output.
 
     Heuristic:
     - If left side is 2+ digits and right side is 1 digit (`\d{2,}[op]\d`),
@@ -96,7 +96,8 @@ def repair_likely_merged_operator(expr: str) -> str:
         return expr
 
     left, op, right = m.groups()
-    # Common OCR merge: "4-2" -> "42-2" (missing operator between first 2 chars).
+    # Common OCR merge: source "4-2" is misread as "42-2"
+    # (operator disappears and adjacent digits appear merged).
     return f"{left[0]}{op}{right}"
 
 
