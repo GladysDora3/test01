@@ -7,7 +7,7 @@ class ArithmeticCaptchaSolverTests(unittest.TestCase):
     def setUp(self):
         self.solver = ArithmeticCaptchaSolver()
 
-    def test_ocr_confused_zero_is_preserved(self):
+    def test_ocr_confused_zero_is_normalized(self):
         result = self.solver.solve_text("1o+2=？")
         self.assertTrue(result.ok)
         self.assertEqual(result.normalized, "10+2")
@@ -30,6 +30,12 @@ class ArithmeticCaptchaSolverTests(unittest.TestCase):
         self.assertTrue(result.ok)
         self.assertEqual(result.fixed_expr, "4-2")
         self.assertEqual(result.answer, 2)
+
+    def test_non_zero_two_digit_operand_is_preserved(self):
+        result = self.solver.solve_text("15+3=?")
+        self.assertTrue(result.ok)
+        self.assertEqual(result.fixed_expr, "15+3")
+        self.assertEqual(result.answer, 18)
 
 
 if __name__ == "__main__":

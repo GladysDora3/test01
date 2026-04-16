@@ -76,21 +76,22 @@ class ArithmeticCaptchaSolver:
     def _fix_merged_operator_cases(self, expr: str) -> str:
         """
         Conservative fix for OCR merged-operator errors.
-        Keep valid two-digit values containing 0 (e.g. 10+2) unchanged.
+        Preserve normal two-digit operands, and only fix when a merged digit
+        pattern is strongly suggested (e.g. 42-2 -> 4-2).
         """
         m = re.fullmatch(r"(\d{2})([+\-*/])(\d{1,2})", expr)
         if m:
             left, op, right = m.groups()
-            if re.fullmatch(r"[1-9]0", left):
-                return expr
-            return f"{left[0]}{op}{right}"
+            if len(right) == 1 and left[1] == right and left[0] != "0":
+                return f"{left[0]}{op}{right}"
+            return expr
 
         m = re.fullmatch(r"(\d{1,2})([+\-*/])(\d{2})", expr)
         if m:
             left, op, right = m.groups()
-            if re.fullmatch(r"[1-9]0", right):
-                return expr
-            return f"{left}{op}{right[0]}"
+            if len(left) == 1 and right[0] == left and right[1] != "0":
+                return f"{left}{op}{right[1]}"
+            return expr
 
         return expr
 
