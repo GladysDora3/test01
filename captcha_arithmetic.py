@@ -24,6 +24,7 @@ _OPERATOR_NORMALIZATION = {
 _ALLOWED_CHARS = set("0123456789+-*/=?")
 _MERGED_PATTERN = re.compile(r"^(\d+)(\d)([+\-*/])\2$")
 _SIMPLE_EXPR_PATTERN = re.compile(r"^(\d+)([+\-*/])(\d+)$")
+_DDDDOCR_INSTANCE = None
 
 
 def preprocess_arithmetic_captcha(image_bytes: bytes) -> bytes:
@@ -110,10 +111,12 @@ def solve_arithmetic_captcha_text(raw_text: str) -> Optional[int]:
 
 
 def _default_ddddocr_classifier(image_bytes: bytes) -> str:
+    global _DDDDOCR_INSTANCE
     import ddddocr
 
-    ocr = ddddocr.DdddOcr(show_ad=False)
-    return ocr.classification(image_bytes)
+    if _DDDDOCR_INSTANCE is None:
+        _DDDDOCR_INSTANCE = ddddocr.DdddOcr(show_ad=False)
+    return _DDDDOCR_INSTANCE.classification(image_bytes)
 
 
 def recognize_arithmetic_captcha(
