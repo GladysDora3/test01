@@ -1,5 +1,6 @@
 import unittest
 from io import StringIO
+import os
 import tempfile
 from types import SimpleNamespace
 from unittest import mock
@@ -96,15 +97,17 @@ class ArithmeticCaptchaSolverTests(unittest.TestCase):
         self.assertTrue(result.ok)
 
     def test_solve_image_path_missing_file(self):
+        missing_path = os.path.join(tempfile.gettempdir(), "does-not-exist.png")
         with self.assertRaises(FileNotFoundError):
-            arithmetic_captcha_solver.solve_image_path("/tmp/does-not-exist.png")
+            arithmetic_captcha_solver.solve_image_path(missing_path)
 
     def test_main_success_output(self):
         fake = SolveResult(True, "42-2", "42-2", "4-2", 2, None)
         out = StringIO()
+        fake_path = os.path.join(tempfile.gettempdir(), "fake.png")
         with mock.patch.object(arithmetic_captcha_solver, "solve_image_path", return_value=fake):
             with mock.patch("sys.stdout", out):
-                code = arithmetic_captcha_solver.main(["/tmp/fake.png"])
+                code = arithmetic_captcha_solver.main([fake_path])
         text = out.getvalue()
         self.assertEqual(code, 0)
         self.assertIn("raw OCR text: 42-2", text)

@@ -139,6 +139,16 @@ def _simplify_answer(value: float) -> Union[float, int]:
 def solve_from_ocr_text(raw_text: str) -> SolveResult:
     normalized = normalize_ocr_text(raw_text)
     fixed = repair_likely_merged_operator(normalized)
+    parsed = parse_expression(fixed)
+    if parsed and parsed[1] == "/" and parsed[2] == 0:
+        return SolveResult(
+            ok=False,
+            raw_text=raw_text,
+            normalized_expression=normalized,
+            fixed_expression=fixed,
+            answer=None,
+            error="division by zero",
+        )
     answer = compute_expression(fixed)
     if answer is None:
         return SolveResult(
