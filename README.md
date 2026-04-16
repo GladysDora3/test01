@@ -4,7 +4,7 @@
 
 Local runnable example is in:
 
-- `/home/runner/work/test01/test01/arithmetic_captcha_solver.py`
+- `arithmetic_captcha_solver.py`
 
 Install dependencies:
 

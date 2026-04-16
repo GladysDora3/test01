@@ -84,23 +84,14 @@ def normalize_ocr_text(text: str) -> str:
     return text
 
 
-def _is_basic_expr(expr: str) -> bool:
-    return bool(re.fullmatch(r"\d+[+\-*/]\d+", expr))
-
-
 def repair_likely_merged_operator(expr: str) -> str:
     r"""Repair likely operator-loss OCR output, e.g. `42-2` -> `4-2`.
 
     Heuristic:
-    - If expression already parseable as one-digit left operand form, keep as-is.
     - If left side is 2+ digits and right side is 1 digit (`\d{2,}[op]\d`),
       prefer taking the first left digit as true left operand.
     """
-    if _is_basic_expr(expr):
-        # Keep normally parsed expression; only adjust suspicious merged-left case below.
-        pass
-
-    m = re.fullmatch(r"(\d{2})([+\-*/])(\d)", expr)
+    m = re.fullmatch(r"(\d{2,})([+\-*/])(\d)", expr)
     if not m:
         return expr
 
