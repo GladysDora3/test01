@@ -128,6 +128,10 @@ def compute_expression(expr: str) -> Optional[float]:
     return None
 
 
+def _format_answer(value: float) -> float | int:
+    return int(value) if value.is_integer() else value
+
+
 def solve_from_ocr_text(raw_text: str) -> SolveResult:
     normalized = normalize_ocr_text(raw_text)
     fixed = repair_likely_merged_operator(normalized)
@@ -146,7 +150,7 @@ def solve_from_ocr_text(raw_text: str) -> SolveResult:
         raw_text=raw_text,
         normalized_expression=normalized,
         fixed_expression=fixed,
-        answer=int(answer) if answer.is_integer() else answer,
+        answer=_format_answer(answer),
         error=None,
     )
 

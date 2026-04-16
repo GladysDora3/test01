@@ -59,7 +59,7 @@ class ArithmeticCaptchaSolverTests(unittest.TestCase):
     def test_solve_image_bytes_with_scored_candidates(self):
         class FakeOcr:
             def __init__(self, show_ad=False):
-                self._ = show_ad
+                self.show_ad = show_ad
 
             def classification(self, sample):
                 if sample == b"v1":
